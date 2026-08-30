@@ -1,9 +1,29 @@
 # SQL Query Agent
 
 Ask a plain-English question, watch Claude write and run the SQL live against a small
-demo dataset, and get a natural-language answer back. Built as a portfolio piece to
-demonstrate SQL + agent/tool-use design (data-analyst / AI-engineer roles) without
-relying on any NDA'd work.
+demo dataset, and get a natural-language answer back.
+
+**Why this exists:** my most substantial project (a NeRF-based cultural preservation
+tool) was built under a DOST NDA and can't be shown publicly. This is a small,
+original project built to demonstrate the same underlying skills — SQL, and agent /
+tool-use design — for data-analyst and AI-engineering roles.
+
+**Status:** code-complete, not currently deployed. It runs entirely in Cloudflare's
+free tier plus the Claude API, and takes about 10 minutes to stand up (steps below) —
+it's just not left running by default, since it calls a paid API per question.
+
+## What this demonstrates
+
+- **SQL:** the schema, seed data, and the model's generated queries are all plain
+  SQL — no ORM standing between the question and the query.
+- **Agent / tool-use design:** a bounded tool-calling loop (question → generated SQL →
+  executed SQL → grounded answer), not a chatbot guessing at numbers from memory.
+- **Security-mindedness on a public endpoint:** the model's SQL is validated
+  SELECT-only before it ever touches the database (`worker/src/validateSql.js`),
+  because letting an LLM's output run unchecked against a real database is a real
+  risk, not a hypothetical one.
+- **Full-stack ownership:** static frontend, edge backend, database, and the deploy
+  path between them — not just a notebook.
 
 ## Architecture
 
@@ -21,7 +41,7 @@ The browser never talks to the Claude API directly — the Worker holds the secr
 and does the actual SQL execution, after checking the generated query is a single
 SELECT statement (see `worker/src/validateSql.js`).
 
-## Setup
+## Deploy it yourself
 
 1. **Install & auth**
    ```
